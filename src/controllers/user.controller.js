@@ -1,9 +1,11 @@
 import env from "../config/config.js";
-import sendEmail from "../lib/sendMail.js";
 import userModel from "../models/user.model.js";
 
 export const getIp = async (req, res) => {
    try {
+      const clientIp =
+         req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
       const token = env.token;
       const getIP = async () => {
          const data = await fetch(`http://ipinfo.io/json?token=${token}`);
