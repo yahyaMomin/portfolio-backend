@@ -11,18 +11,23 @@ export const getIp = async (req, res) => {
          return res;
       };
       const {
-         ip: IP,
+         ip,
          city,
          region,
          country,
-         loc: location,
-         org: Organization,
          postal,
          timezone,
+         loc: location,
+         org: Organization,
       } = await getIP();
 
+      const isExist = await userModel.findOne({ ip: ip });
+
+      if (isExist)
+         return res.status(200).json({ status: "success", user: isExist });
+
       const newUser = new userModel({
-         IP,
+         ip,
          city,
          region,
          country,
