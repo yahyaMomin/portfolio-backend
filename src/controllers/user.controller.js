@@ -43,6 +43,6 @@ export const getIp = async (req, res) => {
 
       res.status(200).json({ status: "success", user });
    } catch (error) {
-      console.log(error.message);
+      res.status(200).json({ status: "error", msg: error.message });
    }
 };
