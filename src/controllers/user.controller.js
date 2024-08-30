@@ -4,13 +4,8 @@ import userModel from "../models/user.model.js";
 export const getIp = async (req, res) => {
    try {
       const forwarded = req.headers["x-forwarded-for"];
-      let clientIp = forwarded
-         ? forwarded.split(",")[0]
-         : req.connection.remoteAddress;
 
-      if (clientIp.startsWith("::ffff:")) {
-         clientIp = clientIp.split("::ffff:")[1];
-      }
+      const clientIp = forwarded ? forwarded.split(",")[0] : "";
 
       const token = env.token;
       const getIP = async () => {
@@ -53,5 +48,13 @@ export const getIp = async (req, res) => {
       res.status(200).json({ status: "success", user });
    } catch (error) {
       res.status(500).json({ status: "error", msg: error.message });
+   }
+};
+export const getallUsers = async (req, res) => {
+   try {
+      const allUsers = await userModel.find().sort({ createdAt: -1 });
+      res.status(200).json({ status: "success", users: allUsers });
+   } catch (error) {
+      return res.status(500).json({ status: "error", msg: error.message });
    }
 };
