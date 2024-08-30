@@ -3,13 +3,22 @@ import userModel from "../models/user.model.js";
 
 export const getIp = async (req, res) => {
    try {
-      const clientIp =
-         req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+      const forwarded = req.headers["x-forwarded-for"];
+      let clientIp = forwarded
+         ? forwarded.split(",")[0]
+         : req.connection.remoteAddress;
+
+      if (clientIp.startsWith("::ffff:")) {
+         clientIp = clientIp.split("::ffff:")[1];
+      }
 
       const token = env.token;
       const getIP = async () => {
-         const data = await fetch(`http://ipinfo.io/json?token=${token}`);
+         const data = await fetch(
+            `http://ipinfo.io/${clientIp}/json?token=${token}`
+         );
          const res = await data.json();
+
          return res;
       };
       const {
@@ -43,6 +52,6 @@ export const getIp = async (req, res) => {
 
       res.status(200).json({ status: "success", user });
    } catch (error) {
-      res.status(200).json({ status: "error", msg: error.message });
+      res.status(500).json({ status: "error", msg: error.message });
    }
 };
